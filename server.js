@@ -148,6 +148,7 @@ app.delete('/admin/winners/:chzzk_id', adminAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-const PORT = process.env.PORT || 3000; // Railway가 주는 포트 사용
-app.listen(PORT, () => console.log(`서버 실행 중: ${PORT}`));
-app.use(express.static('public')); // public 폴더의 파일을 웹으로 보여줌
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+});
