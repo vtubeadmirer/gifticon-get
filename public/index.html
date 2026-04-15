@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🎁 기프티콘 수령</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 60px auto; text-align: center; }
+    .btn { background: #6441a5; color: white; padding: 12px 24px; border: none;
+           border-radius: 8px; font-size: 16px; cursor: pointer; }
+    .gifticon-box { background: #f0f9ff; border: 2px solid #0ea5e9;
+                    border-radius: 12px; padding: 20px; margin: 12px 0; }
+    .code { font-size: 24px; font-weight: bold; letter-spacing: 3px; color: #0369a1; }
+    .claimed { color: #888; font-size: 12px; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>🎉 룰렛 당첨 기프티콘</h1>
+  <div id="app">로딩 중...</div>
+  <script>
+    const API = 'http://localhost:3000';
+    const app = document.getElementById('app');
+    async function init() {
+      const res = await fetch(`${API}/auth/me`, { credentials: 'include' });
+      const data = await res.json();
+      if (!data.loggedIn) {
+        app.innerHTML = `
+          <p>치지직 계정으로 로그인하여 당첨 여부를 확인하세요.</p>
+          <button class="btn" onclick="location.href='${API}/auth/chzzk'">
+            🎮 치지직으로 로그인
+          </button>`;
+        return;
+      }
+      const gi = await fetch(`${API}/api/my-gifticon`, { credentials: 'include' });
+      const gift = await gi.json();
+      if (!gift.winner) {
+        app.innerHTML = `
+          <p>안녕하세요, <b>${data.user.nickname}</b>님!</p>
+          <p class="error">😢 당첨 내역이 없습니다.</p>
+          <button class="btn" onclick="logout()">로그아웃</button>`;
+        return;
+      }
+      let html = `<p>🎊 축하합니다, <b>${data.user.nickname}</b>님!</p>`;
+      for (const g of gift.gifticons) {
+        html += `
+          <div class="gifticon-box">
+            <div class="code">${g.code}</div>
+            ${g.claimed_at ? `<div class="claimed">수령일: ${new Date(g.claimed_at).toLocaleString('ko-KR')}</div>` : ''}
+          </div>`;
+      }
+      html += `<button class="btn" onclick="logout()">로그아웃</button>`;
+      app.innerHTML = html;
+    }
+    async function logout() {
+      await fetch(`${API}/auth/logout`, { credentials: 'include' });
+      init();
+    }
+    init();
+  </script>
+</body>
+</html>
