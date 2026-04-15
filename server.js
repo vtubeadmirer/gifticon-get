@@ -27,6 +27,7 @@ db.exec(`
 `);
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(express.static('public')); // public 폴더의 파일들을 웹으로 보여줌
 app.use(express.json());
 app.use(session({
   secret: process.env.SESSION_SECRET,
